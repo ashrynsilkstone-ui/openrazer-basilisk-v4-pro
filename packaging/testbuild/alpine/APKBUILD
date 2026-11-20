@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+# Based on the Alpine aports community/openrazer package.
+pkgname=openrazer
+pkgver=3.12.4.20261120
+pkgrel=0
+pkgdesc="OpenRazer Basilisk V4 Pro test build"
+url="https://github.com/ashrynsilkstone-ui/openrazer-basilisk-v4-pro"
+arch="noarch"
+license="GPL-2.0-or-later"
+depends="py3-daemonize py3-dbus py3-gobject3 py3-setproctitle py3-udev"
+makedepends="py3-setuptools"
+subpackages="$pkgname-doc $pkgname-src $pkgname-systemd $pkgname-udev py3-$pkgname:py3"
+source="$pkgname-$pkgver.tar.xz"
+options="!check"
+
+package() {
+    make DESTDIR="$pkgdir" appstream_install udev_install daemon_install xdg_install setup_dkms
+}
+
+src() {
+    depends="akms"
+    local path="usr/src/openrazer-driver-$pkgver"
+    install -d "$subpkgdir/$path"
+    mv "$pkgdir/$path/driver/"* "$subpkgdir/$path/"
+    rm -r "$pkgdir/usr/src"
+    cat > "$subpkgdir/$path/AKMBUILD" <<-AKM
+	modname=openrazer-driver
+	modver=$pkgver-r$pkgrel
+	built_modules='razeraccessory.ko razerkbd.ko razerkraken.ko razermouse.ko'
+	AKM
+}
+
+py3() {
+    depends="openrazer=$pkgver-r$pkgrel py3-numpy"
+    cd "$builddir"
+    make DESTDIR="$subpkgdir" python_library_install
+}
+sha512sums="
+02f6704c63102548fde2be61eb4db76f5f1091180c0310d806c68c3792f95f5bf4dbb69f169422095e1826380062ea9312712ca4fa13b70deaaf5ed77ab21250  openrazer-3.12.4.20261120.tar.xz
+"

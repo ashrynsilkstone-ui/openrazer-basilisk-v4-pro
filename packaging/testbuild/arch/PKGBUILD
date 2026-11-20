@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+pkgbase=openrazer
+pkgname=(openrazer-driver-dkms openrazer-daemon python-openrazer)
+pkgver=3.12.4.20261120
+pkgrel=1
+pkgdesc='OpenRazer Basilisk V4 Pro test build'
+arch=(any)
+url=https://github.com/ashrynsilkstone-ui/openrazer-basilisk-v4-pro
+license=(GPL-2.0-or-later)
+makedepends=(python-setuptools)
+source=("openrazer-${pkgver}.tar.xz")
+sha256sums=('66dbe4dee3f25bdcfdf0a7701a85d911751a959b79c18dd8a497a86fa62c636d')
+
+prepare() {
+    cd "openrazer-$pkgver"
+    sed -i 's/\bplugdev\b/openrazer/g' \
+        daemon/openrazer_daemon/daemon.py install_files/udev/{99-razer.rules,razer_mount}
+}
+
+package_openrazer-driver-dkms() {
+    pkgdesc='OpenRazer DKMS module sources (Basilisk V4 Pro test build)'
+    depends=('dkms' 'systemd')
+
+    cd "openrazer-$pkgver"
+    make DESTDIR="$pkgdir" setup_dkms udev_install
+    install -d "$pkgdir/usr/lib/sysusers.d"
+    printf 'g openrazer -\n' > "$pkgdir/usr/lib/sysusers.d/openrazer.conf"
+}
+
+package_openrazer-daemon() {
+    pkgdesc='OpenRazer D-Bus daemon (Basilisk V4 Pro test build)'
+    depends=("openrazer-driver-dkms=$pkgver" python-dbus python-daemonize python-gobject
+             python-pyudev python-setproctitle xautomation)
+    optdepends=('libnotify: battery notifications' 'python-openrazer: Python client')
+
+    cd "openrazer-$pkgver"
+    make DESTDIR="$pkgdir" daemon_install appstream_install
+}
+
+package_python-openrazer() {
+    pkgdesc='OpenRazer Python client (Basilisk V4 Pro test build)'
+    depends=("openrazer-daemon=$pkgver" python-dbus python-gobject python-numpy)
+
+    cd "openrazer-$pkgver"
+    make DESTDIR="$pkgdir" python_library_install
+}

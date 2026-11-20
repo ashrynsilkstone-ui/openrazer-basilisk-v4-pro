@@ -2,6 +2,17 @@
 
 A collection of Linux drivers for Razer devices - providing kernel drivers, DBus services and Python bindings to interact with the DBus interface.
 
+## Basilisk V4 Pro test build
+
+> [!IMPORTANT]
+> This branch is an **experimental OpenRazer test build** for the Razer Basilisk V4 Pro.
+> It supports the USB cable (`1532:00E2`) and HyperSpeed receiver (`1532:00E3`)
+> and adds a separate underglow zone. The HyperSpeed receiver has been exercised on CachyOS.
+
+- [Test build downloads](https://github.com/ashrynsilkstone-ui/openrazer-basilisk-v4-pro/releases/tag/testbuild-20261120)
+- [Native packages and build instructions for every distribution below](packaging/testbuild/README.md)
+- [Basilisk V4 Pro Tray for KDE](https://github.com/ashrynsilkstone-ui/basilisk-v4-tray) shows battery, DPI and polling rate and controls lighting and scroll-wheel settings.
+
 ## Something not working?
 
 Sometimes there are problems with the driver installation due to missing kernel modules or secure boot. Please refer to the [Troubleshooting wiki page](https://github.com/openrazer/openrazer/wiki/Troubleshooting) for guidance.
@@ -34,6 +45,7 @@ Community supported packages are available for:
 
 The following applications complement and interact with this driver:
 
+* [Basilisk V4 Pro Tray for KDE](https://github.com/ashrynsilkstone-ui/basilisk-v4-tray) - live battery, DPI and polling rate with settings for the mouse, lighting and scroll wheel.
 * [Polychromatic](https://github.com/polychromatic/polychromatic) - a graphical management tool and tray applet to managing Razer peripherals.
 * [RazerGenie](https://github.com/z3ntu/RazerGenie) - Qt application for configuring your Razer devices under GNU/Linux.
 * [Snake](http://bithatch.co.uk/snake.html) - a stylised tool and tray applet for configuring Razer devices on Linux, written in Java.

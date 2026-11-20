@@ -1,0 +1,105 @@
+# yaml-language-server: $schema=/usr/share/ypkg/schema/schema.json
+name       : openrazer
+version    : '3.12.4.20261120'
+release    : 20261120
+source     :
+    - https://github.com/ashrynsilkstone-ui/openrazer-basilisk-v4-pro/releases/download/testbuild-20261120/openrazer-3.12.4.20261120.tar.xz : 66dbe4dee3f25bdcfdf0a7701a85d911751a959b79c18dd8a497a86fa62c636d
+homepage   : https://github.com/ashrynsilkstone-ui/openrazer-basilisk-v4-pro
+license    : GPL-2.0-or-later
+component  :
+    - kernel.drivers
+    - current : kernel.drivers
+    - common : system.utils
+    - modaliases : kernel.drivers
+summary    :
+    - OpenRazer Basilisk V4 Pro test build
+    - common : Common component for openrazer kernel modules
+    - current : openrazer for the linux-current kernel
+    - modaliases : These files are used by the Software Center for hardware detection.
+description: |
+    A collection of Linux drivers for the Razer devices, providing kernel drivers, DBus services and Python bindings to interact with the DBus interface
+builddeps  :
+    - pkgconfig(SDL2_image)
+    - pkgconfig(dbus-1)
+    - pkgconfig(fftw3)
+    - pkgconfig(libelf)
+    - pkgconfig(udev)
+    - jq
+    - linux-current
+    - linux-current-headers
+    - linux-lts
+    - linux-lts-headers
+    - python-setuptools
+rundeps    :
+    - common :
+        - numpy
+        - python-daemonize
+        - python-evdev
+        - python-gobject
+        - python-notify2
+        - python-setproctitle
+        - python-pyudev
+        - python3-dbus
+        - xdotool
+    - current :
+        - openrazer-common
+    - openrazer-common
+setup      : |
+    sed -i "s|depmod||g" Makefile
+    pushd ../
+    cp -a "openrazer-${version}" lts-build
+    cp -a "openrazer-${version}" current-build
+    popd
+build      : |
+    pushd lts-build
+    KVER=%kernel_version_lts%
+    %make KERNELDIR=/usr/lib64/modules/$KVER/build MODULEDIR=/usr/lib64/modules/$KVER/extra/drivers/hid
+    popd
+    pushd current-build
+    KVER=%kernel_version_current%
+    %make KERNELDIR=/usr/lib64/modules/$KVER/build MODULEDIR=/usr/lib64/modules/$KVER/extra/drivers/hid
+    popd
+
+    # Generate modaliases from the LTS tree
+    pushd lts-build
+    mkmodaliases "${package}" -o "${package}.modaliases" driver/*.ko
+    popd
+install    : |
+    pushd lts-build
+    KVER=%kernel_version_lts%
+    %install_dir $installdir/usr/lib64/modules/$KVER/extra/drivers/hid
+    %make install_i_know_what_i_am_doing KERNELDIR=/usr/lib64/modules/$KVER/build MODULEDIR=/usr/lib64/modules/$KVER/extra/drivers/hid DESTDIR=$installdir
+    popd
+    # Razer's build system really flops when things already exist.. Autotools wouldn't hurt.
+    rm -rfv $installdir/usr/{lib,share}
+    pushd current-build
+    KVER=%kernel_version_current%
+    %install_dir $installdir/usr/lib64/modules/$KVER/extra/drivers/hid
+    %make install_i_know_what_i_am_doing KERNELDIR=/usr/lib64/modules/$KVER/build MODULEDIR=/usr/lib64/modules/$KVER/extra/drivers/hid DESTDIR=$installdir
+    popd
+
+    # Use example file as default configuration
+    %install_file $installdir/usr/share/openrazer/razer.conf.example $installdir/usr/share/openrazer/razer.conf
+
+    # Now install modaliases for LDM
+    %install_file lts-build/${package}.modaliases $installdir/usr/share/linux-driver-management/modaliases/${package}.modaliases
+
+    # Compress modules with zstd
+    find "$installdir" -name '*.ko' -exec strip --strip-debug {} \; -exec zstd {} \; -exec rm -v {} \;
+
+    # License
+    %install_license openrazer-${version}/LICENSES/*.txt
+patterns   :
+    - common : /*
+    - main :
+        - /usr/lib64/modules/*.lts
+    - current :
+        - /usr/lib64/modules/*.current
+    - modaliases : /usr/share/linux-driver-management/modaliases
+permanent  :
+    - /usr/lib64/modules
+replaces   :
+    - razer-drivers
+    - common : razer-drivers-common
+    - current : razer-drivers-current
+    - modaliases : razer-drivers-modaliases
