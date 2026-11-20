@@ -7,7 +7,7 @@ A collection of Linux drivers for Razer devices - providing kernel drivers, DBus
 > [!IMPORTANT]
 > This branch is an **experimental OpenRazer test build** for the Razer Basilisk V4 Pro.
 > It supports the USB cable (`1532:00E2`) and HyperSpeed receiver (`1532:00E3`)
-> and adds a separate underglow zone. The HyperSpeed receiver has been exercised on CachyOS.
+> and adds a separate underglow zone. Both connections have been tested on CachyOS.
 
 - [Test build downloads](https://github.com/ashrynsilkstone-ui/openrazer-basilisk-v4-pro/releases/tag/testbuild-20261120)
 - [Native packages and build instructions for every distribution below](packaging/testbuild/README.md)
