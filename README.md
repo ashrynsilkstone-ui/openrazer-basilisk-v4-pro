@@ -8,7 +8,7 @@ A collection of Linux drivers for Razer devices - providing kernel drivers, DBus
 > This branch is an **experimental OpenRazer test build** for the Razer Basilisk V4 Pro.
 > It supports the USB cable (`1532:00E2`) and HyperSpeed receiver (`1532:00E3`)
 > and adds a separate underglow zone. Both connections have been tested on CachyOS.
-> In the wired test, Smart Reel engaged once Free Spin was enabled for the active wheel-mode profile.
+> In the wired test, Smart Reel engaged with free spin enabled in the active wheel-mode profile. In the tray, choose a **Modes to cycle through** combination that includes free spin.
 
 - [Test build downloads](https://github.com/ashrynsilkstone-ui/openrazer-basilisk-v4-pro/releases/tag/testbuild-20261120)
 - [Native packages and build instructions for every distribution below](packaging/testbuild/README.md)
